@@ -1,0 +1,33 @@
+Data recorded on Mon Jul 24 08-38-21 CAT 2017
+Time: 8:38:30
+Breathing cycle millis
+Full: 95684
+Empty: 97683
+Full: 99680
+Empty: 101683
+Full: 103683
+Empty: 105680
+Full: 107684
+Empty: 109682
+Full: 111685
+Empty: 113681
+Full: 115682
+Empty: 117681
+Full: 119683
+Empty: 121682
+Full: 123681
+Empty: 125680
+Full: 127687
+Empty: 129682
+Full: 131682
+Empty: 133686
+Full: 135682
+Empty: 137682
+Full: 139683
+Empty: 141681
+Full: 143681
+Empty: 145683
+Full: 147680
+Empty: 149681
+Full: 151688
+Empty: 153683

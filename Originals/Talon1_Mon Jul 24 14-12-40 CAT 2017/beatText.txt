@@ -1,0 +1,4 @@
+Data recorded on Mon Jul 24 14-12-40 CAT 2017
+Time: 14:13:7
+Time		Millis		bpm		Period		SpO2
+13,16	,	29174	,	73	,	880	,	99.65928

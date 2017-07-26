@@ -2,8 +2,14 @@ clear
 clc
 format short g
 
-%% Load data
+%% Select Data folder
+DataFolders = dir ('*Data*');
+str = {DataFolders.name};
+[folderNum,v] = listdlg('PromptString','Select a data file:','SelectionMode','single','ListString',str);
 
+fprintf('Data folder: %s\n', char(str(folderNum)));
+
+%% Load data
 FolderName = 'Data4';
 beatText = csvread(strcat(FolderName, '\beatText.txt'),3,0);
 ppgText = csvread(strcat(FolderName, '\ppgText.txt'),3,0);

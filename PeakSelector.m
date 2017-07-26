@@ -12,7 +12,7 @@ DataFolders = dir ('*Data*');
 str = {DataFolders.name};
 [s,v] = listdlg('PromptString','Select a file:','SelectionMode','single','ListString',str);
 
-fprintf('Data folder: %s', (str(s)));
+fprintf('Data folder: %s\n', char(str(s)));
 
 %% Load data
 FolderName = char(str(s));

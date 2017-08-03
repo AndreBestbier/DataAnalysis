@@ -1,56 +1,104 @@
-clc
 clear
+clc
+format short g
 
-%% Load data
+load AllDataIndex.mat              %All names
+load TempDataIndex.mat        %All names with valid temp (Excludes Philip and Cobus)
+load ControlDataIndex.mat      %4 prticipants used for calibration
+load CalibrationDataIndex.mat  %Participants not used for calibration
 
-FolderName = 'Data2';
-tempText = csvread(strcat(FolderName, '\tempText.txt'),3,0);
-TobjEar = tempText(:,4);
-Tdie = tempText(:,5);
-Vsensor = tempText(:,6);
-time = tempText(:,3);
-time = time - time(1);
+usedDataSet = CalibrationDataIndex;
+err = zeros(length(usedDataSet), 1);
 
-%% Calculation
-B0 = -0.0000294;
-B1 = -0.00000057;
-B2 = 0.00000000463;
-C = 13.4;
-T_ref = 298.15;         %25 degC
-A1 = 0.00175;
-A2 = -0.00001678;
-S0 = 9.4e-14;        %  was 6.4    changed to 9.4
+%% Calibration
+calData = csvread('TempCal_TrailDataSet.txt');
+calTdie = calData(:,1);
+calTdie = calTdie + 273.15;
+calVsensor = calData(:,2);
+calVsensor = calVsensor.*(156.25/1000000000);
+calTobj = calData(:,3);
 
-Vsensor = Vsensor.*(156.25/1000000000);  %Convert digital value to voltage (156.25 per LSB)
-%Tdie = Tdie.*0.03125;              %Convert digital value to deg C (0.03125 per LSB)
-Tdie = Tdie + 273.15;                 %Convert deg C to Kelvin
-
-tdie_tref = Tdie - T_ref;
-S = S0.*(1 + A1.*tdie_tref + A2.*tdie_tref.^2);
-
-Vos = B0 + B1.*tdie_tref + B2.*(tdie_tref.^2);
-
-fVsensor = (Vsensor - Vos) + C.*((Vsensor-Vos).^2);
-
-Tobj = sqrt(sqrt(Tdie.^4 + fVsensor./S));
-
-Tobj = Tobj - 273.15;     %Convert Kelvin back to deg C
-
-
-%% Plot
-figure()
-plot(time, Tobj, time, Tdie, time, Vsensor);
-xlabel('Milliseconds');
-legend('objTemp', 'dieTemp', 'voltage'); title('Original Values');
-
-figure()
-plot(time, Tobj, time, TobjEar);
-legend('Tobj', 'TobjEar');
+for n = 1:length(usedDataSet)
+    
+    %% Load data from textfile
+    FolderName = usedDataSet(n);
+    tempText = csvread(strcat(FolderName, '\tempText.txt'),3,0);
+    TobjMCU = tempText(:,4);            %Tobj as calculated by Arduino code used during trial
+    Tdie = tempText(:,5);               %Tdie measured by TMP006 in degC
+    Vsensor = tempText(:,6);            %Vsensor digialized val from TM006 register
+    Tobj_ActualMean = tempText(1,7);    %ET 100-A average temp (degC)
+    time = tempText(:,3);               %Millis val from Arduino code
+    time = time - time(1);
+    
+    clicksTemp = csvread(strcat(FolderName, '\ClicksTemp.txt'));
+    Tobj_Actual = ones(length(Tdie),1)*Tobj_ActualMean;
+    
 
 
+    %% Call CalCurveFunction to calculate Tobj
+    Tobj = CalCurveFunction(Tdie, Vsensor);
 
-%% Print Results
-fprintf('Average ear object temp = %f\n\n', mean(Tobj));
+
+    %% Results
+    err(n) = mean(abs(Tobj_Actual-Tobj));
+    
+
+    %% Plot
+    % figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
+    % plot(time, TobjMCU, 'Color',[168/255 224/255 222/255]); hold on;
+    % plot(time, Tobj, 'o-', 'Color',[55/255 95/255 153/255], 'MarkerSize', 2, 'MarkerFaceColor', [55/255 95/255 153/255]);
+    % plot([1 time(length(time))], [meanClicksTemp meanClicksTemp], 'Color',[145/255 43/255 43/255]);
+    % plot(time, Tdie_digital);
+    % legend('Tobj(MATLAB)', 'Tobj(MCU)', 'Tclicks', 'Tdie');
+    % axis([0 inf 34 39]);
+    % hold off;
+
+    %% Print Results
+%     fprintf(FolderName);
+%     fprintf('\nAverage Clicks temp\t\t\t\t\t= %f\t\tSTD: %f\n', Tobj_ActualMean, std(clicksTemp));
+%     fprintf('Average ear object temp (MATLAB) \t= %f\t\tSTD: %f\n', mean(Tobj), std(Tobj));
+%     fprintf('Average ear object temp (MCU) \t\t= %f\t\tSTD: %f\n', mean(TobjMCU), std(TobjMCU));
+%     fprintf('Error (MATLAB) \t\t= %f degC\n\n', err(n));
+    
+    %disp([Tdie Vsensor Tobj_Actual]);
+
+    disp(FolderName);
+    disp([Tobj_Actual Tobj]);
+    disp(err(n));
+    
+    
+
+    % disp(FolderName);
+%     for q=1:length(Tobj)
+%         fprintf('%f\t,\t%f\t,\t%f\n', Tdie(q), Vsensor(q), Tobj_Actual(q));
+%     end
+%     fprintf('\n');
+
+    %disp(FolderName);
+    % fprintf('Tdie STD\t%f\n', std(Tdie_digital));
+    % fprintf('Vsensor STD\t%f',  std(Vsensor_digital));
+    % fprintf('\n\n\n\n\n\n\n\n\n\n\n\n');
+end
+
+disp('Errors');
+disp(err);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

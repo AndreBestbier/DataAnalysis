@@ -7,21 +7,17 @@ load TempDataIndex.mat        %All names with valid temp (Excludes Philip and Co
 load ControlDataIndex.mat      %4 prticipants used for calibration
 load CalibrationDataIndex.mat  %Participants not used for calibration
 
-usedDataSet = CalibrationDataIndex;
-err = zeros(length(usedDataSet), 1);
+usedDataSet = TempDataIndex;
+err_1a = zeros(length(usedDataSet)/2, 1);     %Dataset 1 err before calibration
+err_1b = zeros(length(usedDataSet)/2, 1);     %Dataset 1 err after calibration
+err_2a = zeros(length(usedDataSet)/2, 1);     %Datasest 2 err before calibration
+err_2ba = zeros(length(usedDataSet)/2, 1);    %Dataset 2 err after calibration
 
-%% Calibration
-calData = csvread('TempCal_TrailDataSet.txt');
-calTdie = calData(:,1);
-calTdie = calTdie + 273.15;
-calVsensor = calData(:,2);
-calVsensor = calVsensor.*(156.25/1000000000);
-calTobj = calData(:,3);
-
-for n = 1:length(usedDataSet)
-    
-    %% Load data from textfile
-    FolderName = usedDataSet(n);
+for n = 1:length(usedDataSet)/2
+   
+    %% Load the 1st dataset
+    %Ear-Monitor Data
+    FolderName = usedDataSet(2*n-1);
     tempText = csvread(strcat(FolderName, '\tempText.txt'),3,0);
     TobjMCU = tempText(:,4);            %Tobj as calculated by Arduino code used during trial
     Tdie = tempText(:,5);               %Tdie measured by TMP006 in degC
@@ -30,18 +26,41 @@ for n = 1:length(usedDataSet)
     time = tempText(:,3);               %Millis val from Arduino code
     time = time - time(1);
     
+    %ET 100-A Data
+    clicksTemp = csvread(strcat(FolderName, '\ClicksTemp.txt'));
+    Tobj_Actual = ones(length(Tdie),1)*Tobj_ActualMean;
+
+    %% Calibrate equation with first data set
+    Tobj_1a = FirstPolynomialFunction(Tdie, Vsensor);   %1st set before calibration
+    err_1a(n) = mean(Tobj_Actual-Tobj_1a);              %1st error before calibration
+    Tobj_1b = Tobj_1a + err_1a(n);                      %1st set after calibration
+    err_1b(n) = mean(Tobj_Actual-Tobj_1b);              %1st error after calibration
+    
+    %% Load the 2nd dataset
+    %Ear-Monitor Data
+    FolderName = usedDataSet(2*n);
+    tempText = csvread(strcat(FolderName, '\tempText.txt'),3,0);
+    TobjMCU = tempText(:,4);            %Tobj as calculated by Arduino code used during trial
+    Tdie = tempText(:,5);               %Tdie measured by TMP006 in degC
+    Vsensor = tempText(:,6);            %Vsensor digialized val from TM006 register
+    Tobj_ActualMean = tempText(1,7);    %ET 100-A average temp (degC)
+    time = tempText(:,3);               %Millis val from Arduino code
+    time = time - time(1);
+    
+    %ET 100-A Data
     clicksTemp = csvread(strcat(FolderName, '\ClicksTemp.txt'));
     Tobj_Actual = ones(length(Tdie),1)*Tobj_ActualMean;
     
-
-
     %% Call CalCurveFunction to calculate Tobj
-    Tobj = CalCurveFunction(Tdie, Vsensor);
-
+    
+    Tobj_2a = FirstPolynomialFunction(Tdie, Vsensor);   %2nd set before calibration
+    err_2a(n) = mean(Tobj_Actual-Tobj_2a);              %2nd error before calibration
+    Tobj_2b = Tobj_2a + err_1a(n);                      %2nd set after calibration
+    err_2b(n) = mean(abs(Tobj_Actual-Tobj_2b));              %2nd error after calibration
+    
 
     %% Results
-    err(n) = mean(abs(Tobj_Actual-Tobj));
-    
+    %err(n) = mean(abs(Tobj_Actual-Tobj));
 
     %% Plot
     % figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
@@ -63,10 +82,11 @@ for n = 1:length(usedDataSet)
     %disp([Tdie Vsensor Tobj_Actual]);
 
     disp(FolderName);
-    disp([Tobj_Actual Tobj]);
-    disp(err(n));
-    
-    
+    disp('      Set 1     Set 2');
+    disp('Before Calibration:');
+    disp([err_1a(n) err_2a(n)]);
+    disp('After Calibration');
+    disp([err_1b(n) err_2b(n)]);
 
     % disp(FolderName);
 %     for q=1:length(Tobj)
@@ -81,8 +101,9 @@ for n = 1:length(usedDataSet)
 end
 
 disp('Errors');
-disp(err);
-
+disp(err_2b');
+disp('Mean Error');
+disp(mean(err_2b));
 
 
 

@@ -56,7 +56,7 @@ Tobj_test1 = Data1(:,3);
 % Tdie = Tdie_test1;
 % Vsensor = Vsensor_test1;
 % 
-% Tobj = sqrt(sqrt(Tdie.^4 + (Vsensor - (B0 + B1.*(Tdie - 310.15)))./(S0.*(1 + A1.*(Tdie - 310.15))))) - 273.15;
+% Tobj = sqrt(sqrt(calTdie.^4 + (calVsensor - (B0 + B1.*(calTdie - 310.15)))./(S0.*(1 + A1.*(calTdie - 310.15))))) - 273.15;
 
 
 %% Curve formula 4 (1st order Polynomial)

@@ -7,10 +7,15 @@ load TempDataIndex.mat        %All names with valid temp (Excludes Philip and Co
 load ControlDataIndex.mat      %4 prticipants used for calibration
 load CalibrationDataIndex.mat  %Participants not used for calibration
 
-usedDataSet = CalibrationDataIndex;
-err = zeros(length(usedDataSet), 1);
+usedDataSet = ControlDataIndex;
 
-%% Calibration
+absErr_CalCurve = zeros(length(usedDataSet), 1);
+absErr_Poly = zeros(length(usedDataSet), 1);
+err_CalCurve = zeros(length(usedDataSet), 1);
+err_Poly = zeros(length(usedDataSet), 1);
+
+
+%% Calibration data set (Use with Curve Fitting App)
 calData = csvread('TempCal_TrailDataSet.txt');
 calTdie = calData(:,1);
 calTdie = calTdie + 273.15;
@@ -19,8 +24,9 @@ calVsensor = calVsensor.*(156.25/1000000000);
 calTobj = calData(:,3);
 
 for n = 1:length(usedDataSet)
-    
-    %% Load data from textfile
+   
+    %% Load the dataset
+    %Ear-Monitor Data
     FolderName = usedDataSet(n);
     tempText = csvread(strcat(FolderName, '\tempText.txt'),3,0);
     TobjMCU = tempText(:,4);            %Tobj as calculated by Arduino code used during trial
@@ -30,19 +36,23 @@ for n = 1:length(usedDataSet)
     time = tempText(:,3);               %Millis val from Arduino code
     time = time - time(1);
     
+    %ET 100-A Data
     clicksTemp = csvread(strcat(FolderName, '\ClicksTemp.txt'));
     Tobj_Actual = ones(length(Tdie),1)*Tobj_ActualMean;
     
-
-
     %% Call CalCurveFunction to calculate Tobj
-    Tobj = CalCurveFunction(Tdie, Vsensor);
-
-
-    %% Results
-    err(n) = mean(abs(Tobj_Actual-Tobj));
+    Tobj_CalCurve = CalCurveFunction(Tdie, Vsensor);
+    Tobj_Poly = FirstPolynomialFunction(Tdie, Vsensor);
     
 
+    %% Results
+    err_CalCurve(n) = mean(Tobj_Actual-Tobj_CalCurve);
+    err_Poly(n) = mean(Tobj_Actual-Tobj_Poly);
+    
+    absErr_CalCurve(n) = mean(abs(Tobj_Actual-Tobj_CalCurve));
+    absErr_Poly(n) = mean(abs(Tobj_Actual-Tobj_Poly));
+
+    
     %% Plot
     % figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
     % plot(time, TobjMCU, 'Color',[168/255 224/255 222/255]); hold on;
@@ -57,30 +67,35 @@ for n = 1:length(usedDataSet)
 %     fprintf(FolderName);
 %     fprintf('\nAverage Clicks temp\t\t\t\t\t= %f\t\tSTD: %f\n', Tobj_ActualMean, std(clicksTemp));
 %     fprintf('Average ear object temp (MATLAB) \t= %f\t\tSTD: %f\n', mean(Tobj), std(Tobj));
-%     fprintf('Average ear object temp (MCU) \t\t= %f\t\tSTD: %f\n', mean(TobjMCU), std(TobjMCU));
+%     %fprintf('Average ear object temp (MCU) \t\t= %f\t\tSTD: %f\n', mean(TobjMCU), std(TobjMCU));
 %     fprintf('Error (MATLAB) \t\t= %f degC\n\n', err(n));
     
-
-    % disp(FolderName);
-    % clicksTemp
-
-    % disp(FolderName);
+    %fprintf(FolderName);
+%     fprintf('\n%f\t,\t%f\t,\t%f\t,\t%f\t,\t%f\t,\t%f\n\n',...
+%         Tobj_ActualMean, std(clicksTemp), mean(Tobj), std(Tobj), err(n));
+    
+%     disp(FolderName);
 %     for q=1:length(Tobj)
 %         fprintf('%f\t,\t%f\t,\t%f\n', Tdie(q), Vsensor(q), Tobj_Actual(q));
 %     end
 %     fprintf('\n');
 
-    %disp(FolderName);
-    % fprintf('Tdie STD\t%f\n', std(Tdie_digital));
-    % fprintf('Vsensor STD\t%f',  std(Vsensor_digital));
-    % fprintf('\n\n\n\n\n\n\n\n\n\n\n\n');
+
+
+
+
+%     disp(FolderName);
+%     fprintf('Tdie STD\t%f\n', std(Tdie_digital));
+%     fprintf('Vsensor STD\t%f',  std(Vsensor_digital));
+%     fprintf('\n\n\n\n\n\n\n\n\n\n\n\n');
 end
 
 disp('Errors');
-disp(err);
+disp(err_Poly);
+disp('Mean Error');
+disp(mean(err_Poly));
 
-
-
+boxplot([err_CalCurve err_Poly], ["CalCurve" "Polynomial"]);
 
 
 

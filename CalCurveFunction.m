@@ -1,6 +1,6 @@
 function [Tobj] = CalCurveFunction(Tdie, Vsensor)
 
-%sqrt(sqrt(Tdie.^4 + (Vsensor - (B0 + B1.*(Tdie - 310.15)))./(S0.*(1 + A1.*(Tdie - 310.15))))) - 273.15;
+%sqrt(sqrt(calTdie.^4 + (calVsensor - (B0 + B1.*(calTdie - 310.15)))./(S0.*(1 + A1.*(calTdie - 310.15))))) - 273.15;
 
     A1 = 0.0018;
     B0 = -0.0000294;            %-0.0000294

@@ -2,26 +2,78 @@ clear
 clc
 format short g
 
-load AllDataIndex.mat              %All names
-load TempDataIndex.mat        %All names with valid temp (Excludes Philip and Cobus)
-load ControlDataIndex.mat      %4 prticipants used for calibration
+load AllDataIndex.mat          %All names
+load TempDataIndex.mat         %All names with valid temp (Excludes Philip and Cobus)
+load ControlDataIndex.mat      %Participants used for calibration
 load CalibrationDataIndex.mat  %Participants not used for calibration
 
-usedDataSet = ControlDataIndex;
+%usedDataSet = TempDataIndex;
 
-absErr_CalCurve = zeros(length(usedDataSet), 1);
-absErr_Poly = zeros(length(usedDataSet), 1);
+ usedDataSet = ["2. Jarryd1_Data"
+    "2. Jarryd2_Data"
+    "3. Josh1_Data"
+    "3. Josh2_Data"
+    "4. Julian1_Data"
+    "4. Julian2_Data"
+    "6. David1_Data"
+    "6. David2_Data"
+    "7. Dean2_Data"
+    "7. Dean3_Data"
+    "8. Danie1_Data"
+    "8. Danie2_Data"
+    "9. Talon1_Data"
+    "9. Talon2_Data"
+    "10. Gerard1_Data"
+    "10. Gerard3_Data"
+    "11. Philipp1_Data"
+    "11. Philipp2_Data"
+    "12. AndreV1_Data"
+    "12. AndreV2_Data"
+    "13. Tayla1_Data"
+    "13. Tayla2_Data"
+    "14. Marga1_Data"
+    "14. Marga2_Data"
+    "15. Allan1_Data"
+    "15. Allan3_Data"
+    "16. Maretha1_Data"
+    "16. Maretha2_Data"];
+
+%% Initialize variables
 err_CalCurve = zeros(length(usedDataSet), 1);
-err_Poly = zeros(length(usedDataSet), 1);
+absErr_CalCurve = zeros(length(usedDataSet), 1);
 
+err_Poly1 = zeros(length(usedDataSet), 1);
+absErr_Poly1 = zeros(length(usedDataSet), 1);
+
+err_Poly2 = zeros(length(usedDataSet), 1);
+absErr_Poly2 = zeros(length(usedDataSet), 1);
 
 %% Calibration data set (Use with Curve Fitting App)
-calData = csvread('TempCal_TrailDataSet.txt');
+calData = csvread('TempCal_Closest2.txt');      %Text file with 4 calibration participants
 calTdie = calData(:,1);
 calTdie = calTdie + 273.15;
 calVsensor = calData(:,2);
 calVsensor = calVsensor.*(156.25/1000000000);
 calTobj = calData(:,3);
+
+%% Plot surface
+p00 =       26.33;
+p10 =      0.0368;
+p01 =   -1.17e+04;
+
+[X,Y] = meshgrid(linspace(305,309), linspace(-9e-5,3e-5));
+Z = p00 + p10*X + p01*Y;
+surf(X,Y,Z); grid; hold on;
+
+%Attemp2
+p00 =       20.31;
+p10 =     0.05633;
+p01 =  -1.321e+04;    
+       
+[X,Y] = meshgrid(linspace(305,309), linspace(-9e-5,3e-5));
+Z = p00 + p10*X + p01*Y;
+surf(X,Y,Z); grid;
+
 
 for n = 1:length(usedDataSet)
    
@@ -40,17 +92,25 @@ for n = 1:length(usedDataSet)
     clicksTemp = csvread(strcat(FolderName, '\ClicksTemp.txt'));
     Tobj_Actual = ones(length(Tdie),1)*Tobj_ActualMean;
     
+    %% Plot points
+    plot3(Tdie + 273.15, Vsensor.*(156.25/1000000000), Tobj_Actual, '*');
+    
+    
     %% Call CalCurveFunction to calculate Tobj
     Tobj_CalCurve = CalCurveFunction(Tdie, Vsensor);
-    Tobj_Poly = FirstPolynomialFunction(Tdie, Vsensor);
-    
+    Tobj_Poly1 = FirstPolynomialFunction(Tdie, Vsensor);
+    Tobj_Poly2 = SecondPolynomialFunction(Tdie, Vsensor);
 
     %% Results
     err_CalCurve(n) = mean(Tobj_Actual-Tobj_CalCurve);
-    err_Poly(n) = mean(Tobj_Actual-Tobj_Poly);
-    
     absErr_CalCurve(n) = mean(abs(Tobj_Actual-Tobj_CalCurve));
-    absErr_Poly(n) = mean(abs(Tobj_Actual-Tobj_Poly));
+    
+    err_Poly1(n) = mean(Tobj_Actual-Tobj_Poly1);
+    absErr_Poly1(n) = mean(abs(Tobj_Actual-Tobj_Poly1));
+    
+    err_Poly2(n) = mean(Tobj_Actual-Tobj_Poly2);
+    absErr_Poly2(n) =  mean(abs(Tobj_Actual-Tobj_Poly2));
+    
 
     
     %% Plot
@@ -66,19 +126,19 @@ for n = 1:length(usedDataSet)
     %% Print Results
 %     fprintf(FolderName);
 %     fprintf('\nAverage Clicks temp\t\t\t\t\t= %f\t\tSTD: %f\n', Tobj_ActualMean, std(clicksTemp));
-%     fprintf('Average ear object temp (MATLAB) \t= %f\t\tSTD: %f\n', mean(Tobj), std(Tobj));
+%     fprintf('Average ear object temp (MATLAB) \t= %f\t\tSTD: %f\n', mean(Tobj_Poly1), std(Tobj_Poly1));
 %     %fprintf('Average ear object temp (MCU) \t\t= %f\t\tSTD: %f\n', mean(TobjMCU), std(TobjMCU));
-%     fprintf('Error (MATLAB) \t\t= %f degC\n\n', err(n));
+%     fprintf('Error (MATLAB) \t\t= %f degC\n\n', absErr_Poly1(n));
     
     %fprintf(FolderName);
 %     fprintf('\n%f\t,\t%f\t,\t%f\t,\t%f\t,\t%f\t,\t%f\n\n',...
 %         Tobj_ActualMean, std(clicksTemp), mean(Tobj), std(Tobj), err(n));
     
-%     disp(FolderName);
-%     for q=1:length(Tobj)
-%         fprintf('%f\t,\t%f\t,\t%f\n', Tdie(q), Vsensor(q), Tobj_Actual(q));
-%     end
-%     fprintf('\n');
+    fprintf(FolderName);
+    for q=1:length(Tobj_Poly1)
+        fprintf('%f\t,\t%f\t,\t%f\n', Tdie(q), Vsensor(q), Tobj_Actual(q));
+    end
+    fprintf('\n');
 
 
 
@@ -91,11 +151,40 @@ for n = 1:length(usedDataSet)
 end
 
 disp('Errors');
-disp(err_Poly);
+disp(err_Poly1);
 disp('Mean Error');
-disp(mean(err_Poly));
+disp(mean(absErr_Poly1));
 
-boxplot([err_CalCurve err_Poly], ["CalCurve" "Polynomial"]);
+%boxplot([err_CalCurve err_Poly], ["CalCurve" "Polynomial"]);
+
+xlabel('Tdie'); ylabel('Vsensor'); zlabel('Tobj');
+legend("2. Jarryd1","2. Jarryd2","3. Josh1",...
+    "3. Josh2",...
+    "4. Julian1",...
+    "4. Julian2",...
+    "6. David1",...
+    "6. David2a",...
+    "7. Dean2",...
+    "7. Dean3",...
+    "8. Danie1_Data",...
+    "8. Danie2_Data",...
+    "9. Talon1_Data",...
+    "9. Talon2_Data",...
+    "10. Gerard1_Data",...
+    "10. Gerard3_Data",...
+    "11. Philipp1_Data",...
+    "11. Philipp2_Data",...
+    "12. AndreV1_Data",...
+    "12. AndreV2_Data",...
+    "13. Tayla1_Data",...
+    "13. Tayla2_Data",...
+    "14. Marga1_Data",...
+    "14. Marga2_Data",...
+    "15. Allan1_Data",...
+    "15. Allan3_Data",...
+    "16. Maretha1_Data",...
+    "16. Maretha2_Data");
+hold off;
 
 
 

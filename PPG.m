@@ -3,7 +3,7 @@ clc
 format short g
 
 %% Select Data folder
-DataFolders = dir ('*Data*');
+DataFolders = dir ('Trial1/*Data*');
 str = {DataFolders.name};
 [folderNum,v] = listdlg('PromptString','Select a data file:','SelectionMode','single','ListString',str);
 
@@ -11,11 +11,11 @@ fprintf('Data folder: %s\n', char(str(folderNum)));
 
 %% Loading text files--------------------------------------------------------------------------
 FolderName = char(str(folderNum));
-ppgText = csvread(strcat(FolderName, '/ppgText.txt'), 3,0);
-beatText = csvread(strcat(FolderName, '/beatText.txt'), 3,0);
-tempText = csvread(strcat(FolderName, '/tempText.txt'), 3,0);
-Nexus = csvread(strcat(FolderName, '/Nexus.txt'));
-NexusPeaks = csvread(strcat(FolderName, '/NexusPeaks.txt'), 1,0);
+ppgText = csvread(strcat('Trial1/', FolderName, '/ppgText.txt'), 3,0);
+beatText = csvread(strcat('Trial1/', FolderName, '/beatText.txt'), 3,0);
+tempText = csvread(strcat('Trial1/', FolderName, '/tempText.txt'), 3,0);
+Nexus = csvread(strcat('Trial1/', FolderName, '/Nexus.txt'));
+NexusPeaks = csvread(strcat('Trial1/', FolderName, '/NexusPeaks.txt'), 1,0);
 
 %Ear PPG Data variables
 EarPPG = ppgText(:,6);      %Change to 7 for Andre1, 6 for rest
@@ -139,7 +139,7 @@ for i=1:length(EarPeaks)-1
     EarPeriod(i) = EarPeaks(i+1,1) - EarPeaks(i,1);
 end
 
-fileID = fopen(strcat(FolderName, '\EarPeaksMillis.txt'),'w');
+fileID = fopen(strcat('Trial1/', FolderName, '\EarPeaksMillis.txt'),'w');
 fprintf(fileID,'Millis\r\n');
 fprintf(fileID,'%d\r\n',EarPeakMillis');
 fclose(fileID);

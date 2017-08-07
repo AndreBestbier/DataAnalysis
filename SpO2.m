@@ -2,16 +2,16 @@ clear
 clc
 format short g
 
-load DataIndex.mat
+load AuxiliaryDataFiles/AllDataIndex.mat
 
-meanSureSign = zeros(length(DataIndex), 1);
-meanSats_meanAbs = zeros(length(DataIndex), 1);
-meanSats_meanAbs_beats = zeros(length(DataIndex), 1);
-meanSats_rms = zeros(length(DataIndex), 1);
+meanSureSign = zeros(length(AllDataIndex), 1);
+meanSats_meanAbs = zeros(length(AllDataIndex), 1);
+meanSats_meanAbs_beats = zeros(length(AllDataIndex), 1);
+meanSats_rms = zeros(length(AllDataIndex), 1);
 
-errSats_meanAbs = zeros(length(DataIndex), 1);
-errSats_meanAbs_beats = zeros(length(DataIndex), 1);
-errSats_rms = zeros(length(DataIndex), 1);
+errSats_meanAbs = zeros(length(AllDataIndex), 1);
+errSats_meanAbs_beats = zeros(length(AllDataIndex), 1);
+errSats_rms = zeros(length(AllDataIndex), 1);
 
 
 %% Select Data folder
@@ -20,7 +20,7 @@ errSats_rms = zeros(length(DataIndex), 1);
 %     [folderNum,v] = listdlg('PromptString','Select a data file:','SelectionMode','single','ListString',str);
 %     fprintf('Data folder: %s\n\n', char(str(folderNum)));
 
-for n = 1:length(DataIndex)
+for n = 1:length(AllDataIndex)
 %n=1;
 clear r_rms
 clear r_meanAbs
@@ -29,9 +29,9 @@ clear r_meanAbs_beats
 %% Load data
 %FolderName = char(str(folderNum));
 %FolderName = '1. Philip1_Data';
-FolderName = DataIndex(n);
-ppgText = csvread(strcat(FolderName, '\ppgText.txt'),3,0);
-EarPeaksMillis = csvread(strcat(FolderName, '\EarPeaksMillis.txt'),1,0);
+FolderName = AllDataIndex(n);
+ppgText = csvread(strcat('Trial1/', FolderName, '\ppgText.txt'),3,0);
+EarPeaksMillis = csvread(strcat('Trial1/', FolderName, '\EarPeaksMillis.txt'),1,0);
 
 ppgMillis = ppgText(:,3);
 rawIR = ppgText(:,4);
@@ -40,7 +40,7 @@ irFiltered = ppgText(:,6);
 nPPG = length(rawIR);
 X_ppg = ppgMillis;
 
-SureSign = csvread(strcat(FolderName, '\SureSignSats.txt'));
+SureSign = csvread(strcat('Trial1/',  FolderName, '\SureSignSats.txt'));
 SureSign_X = (0:1000:119000)' + X_ppg(1);
 
 %% AC/DC extraction
@@ -125,7 +125,7 @@ irAC_filt = irAC_filt(600:length(irAC_filt));
 redAC_filt = redAC_filt(600:length(redAC_filt));
 
 Sats_meanAbs_beats = Sats_meanAbs_beats(3:length(Sats_meanAbs_beats));
-EarPeaksMillis_X = EarPeaksMillis(numBeats+2:length(EarPeaksMillis));
+EarPeaksMillis_X = EarPeaksMillis(numBeats+3:length(EarPeaksMillis));
 
 
 %% Results
@@ -140,27 +140,30 @@ errSats_meanAbs_beats(n) =  meanSureSign(n)-meanSats_meanAbs_beats(n);
 errSats_rms(n) =  meanSureSign(n)-meanSats_rms(n);
 
 %% Plot
-figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
-subplot(2,1,1)
-plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
-plot(X_ppg, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
-plot(EarPeaksMillis_X, Sats_meanAbs_beats, 'Color',[56/255 52/255 173/255]);
-legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats'); hold off;
+% figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
+% subplot(2,1,1)
+% plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
+% plot(X_ppg, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
+% plot(EarPeaksMillis_X, Sats_meanAbs_beats, 'Color',[56/255 52/255 173/255]);
+% legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats'); hold off;
 
-subplot(2,1,2)
-plot(X_ppg, irAC_filt); hold on;
-plot(X_ppg, redAC_filt);
-plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-legend('IR AC','Red AC'); hold off;
+% subplot(2,1,2)
+% plot(X_ppg, irAC_filt); hold on;
+% plot(X_ppg, redAC_filt);
+% plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+% legend('IR AC','Red AC'); hold off;
 
 
 %% Print Results
+% fprintf('Data folder: %s\n\n', FolderName);
+% fprintf('Average SureSign \t\t\t\t\t= %f\n', meanSureSign(n));
+% fprintf('Average MATLAB Sats_meanAbs \t\t= %f \tSTD: %f\n', meanSats_meanAbs(n), std(Sats_meanAbs));
+% fprintf('Average MATLAB Sats_rms \t\t\t= %f \tSTD: %f\n', meanSats_rms(n), std(Sats_rms));
+% fprintf('Error between SureSign and Sats_meanAbs\t\t\t= %f\n', errSats_meanAbs(n));
+% fprintf('Error between SureSign and Sats_meanAbs_beats\t= %f\n', errSats_meanAbs_beats(n));
+
 fprintf('Data folder: %s\n\n', FolderName);
-fprintf('Average SureSign \t\t\t\t\t= %f\n', meanSureSign(n));
-fprintf('Average MATLAB Sats_meanAbs \t\t= %f \tSTD: %f\n', meanSats_meanAbs(n), std(Sats_meanAbs));
-fprintf('Average MATLAB Sats_rms \t\t\t= %f \tSTD: %f\n', meanSats_rms(n), std(Sats_rms));
-fprintf('Error between SureSign and Sats_meanAbs\t\t\t= %f\n', errSats_meanAbs(n));
-fprintf('Error between SureSign and Sats_meanAbs_beats\t= %f\n', errSats_meanAbs_beats(n));
+disp(SureSign);
 
 end
 

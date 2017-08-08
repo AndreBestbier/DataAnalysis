@@ -140,30 +140,30 @@ errSats_meanAbs_beats(n) =  meanSureSign(n)-meanSats_meanAbs_beats(n);
 errSats_rms(n) =  meanSureSign(n)-meanSats_rms(n);
 
 %% Plot
-% figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
-% subplot(2,1,1)
-% plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
-% plot(X_ppg, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
-% plot(EarPeaksMillis_X, Sats_meanAbs_beats, 'Color',[56/255 52/255 173/255]);
-% legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats'); hold off;
+figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
+subplot(2,1,1)
+plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
+plot(X_ppg, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
+plot(EarPeaksMillis_X, Sats_meanAbs_beats, 'Color',[56/255 52/255 173/255]);
+legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats'); hold off;
 
-% subplot(2,1,2)
-% plot(X_ppg, irAC_filt); hold on;
-% plot(X_ppg, redAC_filt);
-% plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-% legend('IR AC','Red AC'); hold off;
+subplot(2,1,2)
+plot(X_ppg, irAC_filt); hold on;
+plot(X_ppg, redAC_filt);
+plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+legend('IR AC','Red AC'); hold off;
 
 
 %% Print Results
-% fprintf('Data folder: %s\n\n', FolderName);
-% fprintf('Average SureSign \t\t\t\t\t= %f\n', meanSureSign(n));
-% fprintf('Average MATLAB Sats_meanAbs \t\t= %f \tSTD: %f\n', meanSats_meanAbs(n), std(Sats_meanAbs));
-% fprintf('Average MATLAB Sats_rms \t\t\t= %f \tSTD: %f\n', meanSats_rms(n), std(Sats_rms));
-% fprintf('Error between SureSign and Sats_meanAbs\t\t\t= %f\n', errSats_meanAbs(n));
-% fprintf('Error between SureSign and Sats_meanAbs_beats\t= %f\n', errSats_meanAbs_beats(n));
-
 fprintf('Data folder: %s\n\n', FolderName);
-disp(SureSign);
+fprintf('Average SureSign \t\t\t\t\t= %f\n', meanSureSign(n));
+fprintf('Average MATLAB Sats_meanAbs \t\t= %f \tSTD: %f\n', meanSats_meanAbs(n), std(Sats_meanAbs));
+fprintf('Average MATLAB Sats_rms \t\t\t= %f \tSTD: %f\n', meanSats_rms(n), std(Sats_rms));
+fprintf('Error between SureSign and Sats_meanAbs\t\t\t= %f\n', errSats_meanAbs(n));
+fprintf('Error between SureSign and Sats_meanAbs_beats\t= %f\n', errSats_meanAbs_beats(n));
+
+% fprintf('Data folder: %s\n\n', FolderName);
+% disp(SureSign);
 
 end
 

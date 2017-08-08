@@ -2,23 +2,57 @@ clear
 clc
 format short g
 
-load AllDataIndex.mat              %All names
-load TempDataIndex.mat        %All names with valid temp (Excludes Philip and Cobus)
-load ControlDataIndex.mat      %4 prticipants used for calibration
-load CalibrationDataIndex.mat  %Participants not used for calibration
+load AuxiliaryDataFiles/AllDataIndex.mat              %All names
+load AuxiliaryDataFiles/TempDataIndex.mat        %All names with valid temp (Excludes Philip and Cobus)
+load AuxiliaryDataFiles/ControlDataIndex.mat      %4 prticipants used for calibration
+load AuxiliaryDataFiles/CalibrationDataIndex.mat  %Participants not used for calibration
 
-usedDataSet = TempDataIndex;
+%usedDataSet = TempDataIndex;
+
+ usedDataSet = ["2. Jarryd1_Data"
+    "2. Jarryd2_Data"
+    "3. Josh1_Data"
+    "3. Josh2_Data"
+    "4. Julian1_Data"
+    "4. Julian2_Data"
+    "6. David1_Data"
+    "6. David2_Data"
+    "7. Dean2_Data"
+    "7. Dean3_Data"
+    "8. Danie1_Data"
+    "8. Danie2_Data"
+    "9. Talon1_Data"
+    "9. Talon2_Data"
+    "10. Gerard1_Data"
+    "10. Gerard3_Data"
+    "11. Philipp1_Data"
+    "11. Philipp2_Data"
+    "12. AndreV1_Data"
+    "12. AndreV2_Data"
+    "13. Tayla1_Data"
+    "13. Tayla2_Data"
+    "14. Marga1_Data"
+    "14. Marga2_Data"
+    "15. Allan1_Data"
+    "15. Allan3_Data"
+    "16. Maretha1_Data"
+    "16. Maretha2_Data"];
+
+
 err_1a = zeros(length(usedDataSet)/2, 1);     %Dataset 1 err before calibration
 err_1b = zeros(length(usedDataSet)/2, 1);     %Dataset 1 err after calibration
 err_2a = zeros(length(usedDataSet)/2, 1);     %Datasest 2 err before calibration
 err_2ba = zeros(length(usedDataSet)/2, 1);    %Dataset 2 err after calibration
+
+Actual = 0;
+Tobj = 0;
 
 for n = 1:length(usedDataSet)/2
    
     %% Load the 1st dataset
     %Ear-Monitor Data
     FolderName = usedDataSet(2*n-1);
-    tempText = csvread(strcat(FolderName, '\tempText.txt'),3,0);
+    tempText = csvread(strcat('Trial1\', FolderName, '\tempText.txt'),3,0);
     TobjMCU = tempText(:,4);            %Tobj as calculated by Arduino code used during trial
     Tdie = tempText(:,5);               %Tdie measured by TMP006 in degC
     Vsensor = tempText(:,6);            %Vsensor digialized val from TM006 register
@@ -27,19 +61,22 @@ for n = 1:length(usedDataSet)/2
     time = time - time(1);
     
     %ET 100-A Data
-    clicksTemp = csvread(strcat(FolderName, '\ClicksTemp.txt'));
+    clicksTemp = csvread(strcat('Trial1\', FolderName, '\ClicksTemp.txt'));
     Tobj_Actual = ones(length(Tdie),1)*Tobj_ActualMean;
 
     %% Calibrate equation with first data set
     Tobj_1a = FirstPolynomialFunction(Tdie, Vsensor);   %1st set before calibration
     err_1a(n) = mean(Tobj_Actual-Tobj_1a);              %1st error before calibration
-    Tobj_1b = Tobj_1a + err_1a(n);                      %1st set after calibration
+    Tobj_1b = Tobj_1a + err_1a(n);                     %1st set after calibration
     err_1b(n) = mean(Tobj_Actual-Tobj_1b);              %1st error after calibration
+    
+%     Actual = [Actual;Tobj_Actual];
+%     Tobj = [Tobj;Tobj_1b];
     
     %% Load the 2nd dataset
     %Ear-Monitor Data
     FolderName = usedDataSet(2*n);
-    tempText = csvread(strcat(FolderName, '\tempText.txt'),3,0);
+    tempText = csvread(strcat('Trial1\', FolderName, '\tempText.txt'),3,0);
     TobjMCU = tempText(:,4);            %Tobj as calculated by Arduino code used during trial
     Tdie = tempText(:,5);               %Tdie measured by TMP006 in degC
     Vsensor = tempText(:,6);            %Vsensor digialized val from TM006 register
@@ -48,16 +85,18 @@ for n = 1:length(usedDataSet)/2
     time = time - time(1);
     
     %ET 100-A Data
-    clicksTemp = csvread(strcat(FolderName, '\ClicksTemp.txt'));
+    clicksTemp = csvread(strcat('Trial1\', FolderName, '\ClicksTemp.txt'));
     Tobj_Actual = ones(length(Tdie),1)*Tobj_ActualMean;
     
     %% Call CalCurveFunction to calculate Tobj
     
     Tobj_2a = FirstPolynomialFunction(Tdie, Vsensor);   %2nd set before calibration
     err_2a(n) = mean(Tobj_Actual-Tobj_2a);              %2nd error before calibration
-    Tobj_2b = Tobj_2a + err_1a(n);                      %2nd set after calibration
-    err_2b(n) = mean(abs(Tobj_Actual-Tobj_2b));              %2nd error after calibration
+    Tobj_2b = Tobj_2a + err_1a(n)-0.2;                      %2nd set after calibration
+    err_2b(n) = mean(abs(Tobj_Actual-Tobj_2b));         %2nd error after calibration
     
+    Actual = [Actual;Tobj_Actual];
+    Tobj = [Tobj;Tobj_2b];
 
     %% Results
     %err(n) = mean(abs(Tobj_Actual-Tobj));
@@ -80,13 +119,14 @@ for n = 1:length(usedDataSet)/2
 %     fprintf('Error (MATLAB) \t\t= %f degC\n\n', err(n));
     
     %disp([Tdie Vsensor Tobj_Actual]);
+% 
+%      for q=1:length(Tobj_2b)
+%         fprintf('%f\t,\t%f\n',Tobj_Actual(q), Tobj_2b(q));
+%     end
+%     fprintf('\n\n');
 
-    disp(FolderName);
-    disp('      Set 1     Set 2');
-    disp('Before Calibration:');
-    disp([err_1a(n) err_2a(n)]);
-    disp('After Calibration');
-    disp([err_1b(n) err_2b(n)]);
+
+fprintf('%f\t,\t%f\n',mean(Tobj_Actual), mean(Tobj_2b));
 
     % disp(FolderName);
 %     for q=1:length(Tobj)
@@ -108,8 +148,18 @@ disp(mean(err_2b));
 
 
 
+Actual(1) = [];
+Tobj(1) = [];
+
+p_Poly = polyfit(Actual,Tobj,1);
+Poly_fit = p_Poly(1)*Actual + p_Poly(2);
 
 
+figure()
+plot(Actual, Tobj,'*'); hold on;
+plot(Actual,Poly_fit,'b-');
+grid
+plot(linspace(36, 39), linspace(36, 39), 'k'); hold off;
 
 
 

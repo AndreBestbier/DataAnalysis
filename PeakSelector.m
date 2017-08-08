@@ -8,7 +8,7 @@ clear
 clc
 
 %% Select Data folder
-DataFolders = dir ('*Data*');
+DataFolders = dir ('Trial1/*Data*');
 str = {DataFolders.name};
 [s,v] = listdlg('PromptString','Select a file:','SelectionMode','single','ListString',str);
 
@@ -16,7 +16,7 @@ fprintf('Data folder: %s\n', char(str(s)));
 
 %% Load data
 FolderName = char(str(s));
-Nexus = csvread(strcat(FolderName, '/Nexus.txt'));
+Nexus = csvread(strcat('Trial1/', FolderName, '/Nexus.txt'));
 NexusPPG = Nexus(:,1);
 NexusPPG = detrend(NexusPPG);
 
@@ -59,7 +59,7 @@ end
 numNexusPeaks = numNexusPeaks + length(x);
 
 
-fileID = fopen(strcat(FolderName, '\NexusPeaks.txt'),'w');
+fileID = fopen(strcat('Trial1/', FolderName, '\NexusPeaks.txt'),'w');
 fprintf(fileID,'Time\t\t\tHeight\r\n');
 fprintf(fileID,'%f\t,\t%f\r\n',NexusPeaks');
 fclose(fileID);

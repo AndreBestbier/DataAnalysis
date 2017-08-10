@@ -155,19 +155,19 @@ end
 %% Plot peak detection
 Period_X = 1:numOfPeaks_Nexus-1;
 
-figure('name',FolderName);
-subplot(2,1,1);
-plot(EarPPG_X, SSF, 'k'); grid; hold on;
-plot(EarPPG_X, threshold);
-plot(EarPeaks(:,1), EarPeaks(:,2), 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-title('Ear-Monitor: Beat Detection'); legend('Ear-Monitor SSF', 'Threshold', 'Beats detected');
-ylabel('Ear-Monitor SSF value'); xlabel('Time (MS)'); hold off;
-
-subplot(2,1,2);
-plot(NexusPPG_X, NexusPPG, 'k'); grid; hold on;
-plot(NexusPeaks(:,1), NexusPeaks(:,2), 'o', 'Color',[1 0 0],  'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-title('Nexus-10: Beat Annotation'); legend('Nexus-10 PPG','Beats annotated');
-ylabel('nexus-10 PPG value'); xlabel('Time (MS)'); hold off;
+% figure('name',FolderName);
+% subplot(2,1,1);
+% plot(EarPPG_X, SSF, 'k'); grid; hold on;
+% plot(EarPPG_X, threshold);
+% plot(EarPeaks(:,1), EarPeaks(:,2), 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+% title('Ear-Monitor: Beat Detection'); legend('Ear-Monitor SSF', 'Threshold', 'Beats detected');
+% ylabel('Ear-Monitor SSF value'); xlabel('Time (MS)'); hold off;
+% 
+% subplot(2,1,2);
+% plot(NexusPPG_X, NexusPPG, 'k'); grid; hold on;
+% plot(NexusPeaks(:,1), NexusPeaks(:,2), 'o', 'Color',[1 0 0],  'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+% title('Nexus-10: Beat Annotation'); legend('Nexus-10 PPG','Beats annotated');
+% ylabel('nexus-10 PPG value'); xlabel('Time (MS)'); hold off;
 
 %% Plot magnatude envelopes
 [upEar, loEar] = envelope(EarPPG, 40,'peak');
@@ -185,18 +185,18 @@ upNexus = upNexus(clipStartNexus:length(upNexus)-clipEndNexus);
 loNexus = loNexus(clipStartNexus:length(loNexus)-clipEndNexus);
 NexusTimex = NexusPPG_X(clipStartNexus:length(NexusPPG_X)-clipEndNexus);
 
-figure('name',FolderName);
-subplot(2,1,1);
-plot(EarPPG_X, EarPPG, 'k'); grid; hold on;
-plot(earTimePPGx, upEar, '--k', earTimePPGx, loEar, '--k');
-title('Ear-Monitor PPG and envelopes'); legend('Ear-Monitor PPG','Envelopes');
-ylabel('PPG value'); xlabel('Time (ms)'); hold off;
-
-subplot(2,1,2);
-plot(NexusPPG_X, NexusPPG, 'k'); grid; hold on;
-plot(NexusTimex, upNexus, '--k', NexusTimex, loNexus, '--k');
-title('Nexus-10 PPG and envelopes'); legend('Nexus-10 PPG','Envelopes');
-ylabel('PPG value'); xlabel('Time (ms)'); hold off;
+% figure('name',FolderName);
+% subplot(2,1,1);
+% plot(EarPPG_X, EarPPG, 'k'); grid; hold on;
+% plot(earTimePPGx, upEar, '--k', earTimePPGx, loEar, '--k');
+% title('Ear-Monitor PPG and envelopes'); legend('Ear-Monitor PPG','Envelopes');
+% ylabel('PPG value'); xlabel('Time (ms)'); hold off;
+% 
+% subplot(2,1,2);
+% plot(NexusPPG_X, NexusPPG, 'k'); grid; hold on;
+% plot(NexusTimex, upNexus, '--k', NexusTimex, loNexus, '--k');
+% title('Nexus-10 PPG and envelopes'); legend('Nexus-10 PPG','Envelopes');
+% ylabel('PPG value'); xlabel('Time (ms)'); hold off;
 
 magnatudeEar = upEar-loEar;
 magnatudeNexus = upNexus-loNexus;
@@ -205,12 +205,12 @@ mean_magnatudeEar = mean(magnatudeEar);
 mean_magnatudeNexus = mean(magnatudeNexus);
 
 %% Plot peaks overlapping
-figure('name',FolderName);
-plot(EarPPG_X, SSF); grid; hold on;
-plot(EarPeaks(:,1), EarPeaks(:,2), 'o', 'Color',[0 0 1], 'MarkerSize', 3, 'MarkerFaceColor', [0 0 1]);
-plot(NexusPPG_X, NexusPPG); grid;
-plot(NexusPeaks(:,1), NexusPeaks(:,2), 'o', 'Color',[1 0 0],  'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-hold off;
+% figure('name',FolderName);
+% plot(EarPPG_X, SSF); grid; hold on;
+% plot(EarPeaks(:,1), EarPeaks(:,2), 'o', 'Color',[0 0 1], 'MarkerSize', 3, 'MarkerFaceColor', [0 0 1]);
+% plot(NexusPPG_X, NexusPPG); grid;
+% plot(NexusPeaks(:,1), NexusPeaks(:,2), 'o', 'Color',[1 0 0],  'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+% hold off;
 
 %% Plot resperation (RSP)
 EarPeriod_DT = detrend(EarPeriod);
@@ -222,22 +222,19 @@ for i=2:length(EarPeriod_DT)
     EarPeriod_MA(i) = mean(EarPeriod_DT(i-1:i));
 end
 
-figure('name',FolderName);
-%plot(EarPeaks(1:numOfPeaks_Ear-1, 1), EarPeriod_DT, '-o', 'MarkerSize', 3, 'MarkerFaceColor', 'k'); hold on;
-plot(NexusPPG_X, NexusRSP_DT.*10); hold on;
-plot(EarPeaks(1:numOfPeaks_Ear-1, 1), EarPeriod_MA, '-o', 'MarkerSize', 3, 'MarkerFaceColor', 'y'); hold on;
-title(strcat(FolderName, ': Resperation Plots')); xlabel('Time (ms)'); ylabel('Nexus chest expantion and Ear-Monitor beat period');
-
-for i=2:length(EarPeriod_MA)-1
-    if EarPeriod_MA(i)<EarPeriod_MA(i-1) && EarPeriod_MA(i)<EarPeriod_MA(i+1)
-    plot(EarPeaks(i, 1), EarPeriod_MA(i), 'r*');
-    numBreathsDetected = numBreathsDetected+1;
-    end
-end
-
-
-
-legend('Ear-Monitor beat period','Chest expantion'); hold off;
+% figure('name',FolderName);
+% plot(NexusPPG_X, NexusRSP_DT.*10); hold on;
+% plot(EarPeaks(1:numOfPeaks_Ear-1, 1), EarPeriod_MA, '-o', 'MarkerSize', 3, 'MarkerFaceColor', 'y'); hold on;
+% title(strcat(FolderName, ': Resperation Plots')); xlabel('Time (ms)'); ylabel('Nexus chest expantion and Ear-Monitor beat period');
+% 
+% for i=2:length(EarPeriod_MA)-1
+%     if EarPeriod_MA(i)<EarPeriod_MA(i-1) && EarPeriod_MA(i)<EarPeriod_MA(i+1)
+%     plot(EarPeaks(i, 1), EarPeriod_MA(i), 'r*');
+%     numBreathsDetected = numBreathsDetected+1;
+%     end
+% end
+% 
+% legend('Ear-Monitor beat period','Chest expantion'); hold off;
 
 %% Plot Average HR
 for i=1:length(EarPeriod)-10
@@ -262,22 +259,22 @@ if numOfPeaks_Ear==numOfPeaks_Nexus
 
 
     %% Plot Periods
-    figure('name',FolderName);
-    subplot(2,1,1);
-    plot(Period_X, EarPeriod, '-*', 'Color', 'k', 'MarkerSize', 4); hold on; grid;
-    plot(Period_X, NexusPeriod, '--o','Color','k',  'MarkerSize', 3, 'MarkerFaceColor', 'k');
-    title('Beat periods (msec)'); legend('Ear-Monitor Period', 'Nexus-10 Period');
-    subplot(2,1,2);
-    plot(Period_X, NexusPeriod-EarPeriod, 'k-.');
-    title('Beat period error (msec)'); legend('Error (Scaled)');
-    ylabel('Period time (ms)'); xlabel('Period number'); hold off;
-
-
-    figure('name',FolderName);
-    plot(BeatsTime, bpmEar, '-*', 'Color', 'k', 'MarkerSize', 4); grid; hold on;
-    plot(BeatsTime, bpmNexus, '--o','Color','k',  'MarkerSize', 3, 'MarkerFaceColor', 'k');
-    title('10-beat mean heartrate'); legend('bpmEar', 'bpmNexus');
-    ylabel('Ten-beat mean heartrate (bpm)'); xlabel('Calculation number'); hold off;
+%     figure('name',FolderName);
+%     subplot(2,1,1);
+%     plot(Period_X, EarPeriod, '-*', 'Color', 'k', 'MarkerSize', 4); hold on; grid;
+%     plot(Period_X, NexusPeriod, '--o','Color','k',  'MarkerSize', 3, 'MarkerFaceColor', 'k');
+%     title('Beat periods (msec)'); legend('Ear-Monitor Period', 'Nexus-10 Period');
+%     subplot(2,1,2);
+%     plot(Period_X, NexusPeriod-EarPeriod, 'k-.');
+%     title('Beat period error (msec)'); legend('Error (Scaled)');
+%     ylabel('Period time (ms)'); xlabel('Period number'); hold off;
+% 
+% 
+%     figure('name',FolderName);
+%     plot(BeatsTime, bpmEar, '-*', 'Color', 'k', 'MarkerSize', 4); grid; hold on;
+%     plot(BeatsTime, bpmNexus, '--o','Color','k',  'MarkerSize', 3, 'MarkerFaceColor', 'k');
+%     title('10-beat mean heartrate'); legend('bpmEar', 'bpmNexus');
+%     ylabel('Ten-beat mean heartrate (bpm)'); xlabel('Calculation number'); hold off;
 
 end
 
@@ -304,6 +301,8 @@ else
 end
 %fprintf('\tPeriod Err:\t\t%f\n', mean_errBreathPeriod);
 
+fprintf('\n\n\nbpmNexus\tbpmEar\n');
+fprintf('%f\t,\t%f\n', bpmNexus, bpmEar)
 
 
 
@@ -321,42 +320,8 @@ end
 
 
 
-
-
-%% Respiratory rate
+% %% Respiratory rate
 % [Ear_BreathingPeriod, Nexus_BreathingPeriod] = Respiration(EarPeriod, NexusRSP);
 % errBreathPeriod = abs(Ear_BreathingPeriod - Nexus_BreathingPeriod);
 % mean_errBreathPeriod = mean(errBreathPeriod);
 
-
-%% Beat Detection Nexus (auto)
-% peak_Num_Nexus = 0;
-% prev_Peak = 0;
-% sum = 0;
-% 
-% for i=1:length(NexusPPG)
-%     sum = sum+NexusPPG(i);
-% end
-% avg = sum/length(NexusPPG);
-% threshold_Nexus = 5;
-% 
-% for i=2:length(NexusPPG)-1
-%     if NexusPPG(i)>threshold_Nexus
-%        if NexusPPG(i-1)<NexusPPG(i) && NexusPPG(i)>=NexusPPG(i+1) && NexusTime(i)-prev_Peak>300
-%             peak_Num_Nexus = peak_Num_Nexus+1;
-%             NexusPeaks(peak_Num_Nexus,1) = NexusTime(i);
-%             NexusPeaks(peak_Num_Nexus,2) = NexusPPG(i);
-%             prev_Peak = NexusTime(i);
-% 
-%             if peak_Num_Nexus>1
-%                  NexusPeriod(peak_Num_Nexus-1,1) = NexusPeaks(peak_Num_Nexus,1)-NexusPeaks(peak_Num_Nexus-1,1);
-%             end
-%             
-%             if peak_Num_Nexus>2
-%                 %threshold_Nexus = mean(NexusPeaks(peak_Num2-2:peak_Num2,2))*1.5;
-%                 %disp(threshold_Nexus);
-%             end
-%         end
-%     end
-% 
-% end

@@ -6,42 +6,37 @@ load AuxiliaryDataFiles/AllDataIndex.mat
 
 meanSureSign = zeros(length(AllDataIndex), 1);
 meanSats_meanAbs = zeros(length(AllDataIndex), 1);
-meanSats_meanAbs_beats = zeros(length(AllDataIndex), 1);
+meanSats_meanAbs_beats1 = zeros(length(AllDataIndex), 1);
+meanSats_meanAbs_beats2 = zeros(length(AllDataIndex), 1);
 meanSats_rms = zeros(length(AllDataIndex), 1);
 
 errSats_meanAbs = zeros(length(AllDataIndex), 1);
-errSats_meanAbs_beats = zeros(length(AllDataIndex), 1);
+errSats_meanAbs_beats1 = zeros(length(AllDataIndex), 1);
+errSats_meanAbs_beats2 = zeros(length(AllDataIndex), 1);
 errSats_rms = zeros(length(AllDataIndex), 1);
 
 
-%% Select Data folder
-%     DataFolders = dir ('*Data*');
-%     str = {DataFolders.name};
-%     [folderNum,v] = listdlg('PromptString','Select a data file:','SelectionMode','single','ListString',str);
-%     fprintf('Data folder: %s\n\n', char(str(folderNum)));
-
 for n = 1:length(AllDataIndex)
-%n=1;
 clear r_rms
 clear r_meanAbs
 clear r_meanAbs_beats
     
 %% Load data
 %FolderName = char(str(folderNum));
-%FolderName = '1. Philip1_Data';
+%FolderName = '1. Philip2_Data';
 FolderName = AllDataIndex(n);
+
 ppgText = csvread(strcat('Trial1/', FolderName, '\ppgText.txt'),3,0);
-EarPeaksMillis = csvread(strcat('Trial1/', FolderName, '\EarPeaksMillis.txt'),1,0);
+EarPeaksMillis = csvread(strcat('Trial1/', FolderName, '\EarPeaksMillis.txt'),1,0);%Peaks in Processing time
 
 ppgMillis = ppgText(:,3);
 rawIR = ppgText(:,4);
 rawRed = ppgText(:,5);
 irFiltered = ppgText(:,6);
 nPPG = length(rawIR);
-X_ppg = ppgMillis;
 
 SureSign = csvread(strcat('Trial1/',  FolderName, '\SureSignSats.txt'));
-SureSign_X = (0:1000:119000)' + X_ppg(1);
+SureSign_X = (1000:1000:120000)' + ppgMillis(1);
 
 %% AC/DC extraction
 alpha = 0.7;               
@@ -99,7 +94,7 @@ numBeats = 12;
 peakIndex = zeros(length(EarPeaksMillis)+1, 1);
 peakIndex(1) = 1;
 for i=2:length(EarPeaksMillis)
-peakIndex(i) = find(X_ppg == EarPeaksMillis(i));
+    peakIndex(i) = find(ppgMillis == EarPeaksMillis(i));
 end
 
 for i=1:length(EarPeaksMillis)-numBeats
@@ -111,61 +106,96 @@ for i=1:length(EarPeaksMillis)-numBeats
     r_meanAbs_beats(i) = (redAC_meanAbs/redDC_meanAbs)/(irAC_meanAbs/irDC_meanAbs);
 end
 
-Sats_meanAbs_beats = 111.2-(25*r_meanAbs_beats);
+Sats_meanAbs_beats1 = 111.2-(25*r_meanAbs_beats);
+Sats_meanAbs_beats2 = 100-(100-(111.2-(25*r_meanAbs_beats)))*0.6;
 
-%%Remove transients
+%% Second by second comparison
+for q=1:60
+    
+    SatsActual(q) = SureSign(59+q);
+    time = SureSign_X(59+q);
+    [val, idx] = min(abs(EarPeaksMillis-time));
+    closest = EarPeaksMillis(idx);
+    SatsHeadband(q) = Sats_meanAbs_beats2(idx-12);
+    
+    %disp([SatsActual(q) SatsHeadband(q)]);
+    
+end
+%disp(SatsActual')
+
+%% Remove transients
 SureSign = SureSign(12:length(SureSign));
 SureSign_X = SureSign_X(12:length(SureSign_X));
 
 Sats_meanAbs = Sats_meanAbs(600:length(Sats_meanAbs));
 Sats_rms = Sats_rms(600:length(Sats_rms));
-X_ppg = X_ppg(600:length(X_ppg));
+ppgMillis = ppgMillis(600:length(ppgMillis));
 
 irAC_filt = irAC_filt(600:length(irAC_filt));
 redAC_filt = redAC_filt(600:length(redAC_filt));
 
-Sats_meanAbs_beats = Sats_meanAbs_beats(3:length(Sats_meanAbs_beats));
+Sats_meanAbs_beats1 = Sats_meanAbs_beats1(3:length(Sats_meanAbs_beats1));
+Sats_meanAbs_beats2 = Sats_meanAbs_beats2(3:length(Sats_meanAbs_beats2));
 EarPeaksMillis_X = EarPeaksMillis(numBeats+3:length(EarPeaksMillis));
 
+EarPeaksMillis_X = EarPeaksMillis_X-EarPeaksMillis_X(1);
+ppgMillis = ppgMillis-ppgMillis(1);
+SureSign_X = SureSign_X-SureSign_X(1);
 
 %% Results
 meanSureSign(n) = mean(SureSign);
 meanSats_meanAbs(n) = mean(Sats_meanAbs);
-meanSats_meanAbs_beats(n) = mean(Sats_meanAbs_beats);
+meanSats_meanAbs_beats1(n) = mean(Sats_meanAbs_beats1);
+meanSats_meanAbs_beats2(n) = mean(Sats_meanAbs_beats2);
 meanSats_rms(n) = mean(Sats_rms);
 
 errSats_meanAbs(n) =  meanSureSign(n)-meanSats_meanAbs(n);
-errSats_meanAbs_beats(n) =  meanSureSign(n)-meanSats_meanAbs_beats(n);
-
+errSats_meanAbs_beats1(n) =  meanSureSign(n)-meanSats_meanAbs_beats1(n);
+errSats_meanAbs_beats2(n) =  meanSureSign(n)-meanSats_meanAbs_beats2(n);
 errSats_rms(n) =  meanSureSign(n)-meanSats_rms(n);
 
 %% Plot
-figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
-subplot(2,1,1)
-plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
-plot(X_ppg, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
-plot(EarPeaksMillis_X, Sats_meanAbs_beats, 'Color',[56/255 52/255 173/255]);
-legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats'); hold off;
-
-subplot(2,1,2)
-plot(X_ppg, irAC_filt); hold on;
-plot(X_ppg, redAC_filt);
-plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-legend('IR AC','Red AC'); hold off;
+% figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
+% subplot(2,1,1)
+% plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
+% plot(ppgMillis, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
+% plot(EarPeaksMillis_X, Sats_meanAbs_beats1, 'Color',[56/255 52/255 173/255]);
+% plot(EarPeaksMillis_X, Sats_meanAbs_beats2, 'Color',[200/255 100/255 173/255]);
+% axis([SureSign_X(1)-1000 SureSign_X(length(SureSign_X))+1000 92 103]);
+% %legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats1', 'MATLAB Sats-meanAbs-beats2'); hold off;
+% 
+% subplot(2,1,2)
+% plot(ppgMillis, irAC_filt); hold on;
+% plot(ppgMillis, redAC_filt);
+% plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+% axis([SureSign_X(1)-1000 SureSign_X(length(SureSign_X))+1000 -100 100]);
+% legend('IR AC','Red AC'); hold off;
 
 
 %% Print Results
-fprintf('Data folder: %s\n\n', FolderName);
-fprintf('Average SureSign \t\t\t\t\t= %f\n', meanSureSign(n));
-fprintf('Average MATLAB Sats_meanAbs \t\t= %f \tSTD: %f\n', meanSats_meanAbs(n), std(Sats_meanAbs));
-fprintf('Average MATLAB Sats_rms \t\t\t= %f \tSTD: %f\n', meanSats_rms(n), std(Sats_rms));
-fprintf('Error between SureSign and Sats_meanAbs\t\t\t= %f\n', errSats_meanAbs(n));
-fprintf('Error between SureSign and Sats_meanAbs_beats\t= %f\n', errSats_meanAbs_beats(n));
+% fprintf('\n\nData folder: %s\n', FolderName);
+% fprintf('Average SureSign \t\t\t\t\t= %f\n', meanSureSign(n));
+% fprintf('Average MATLAB Sats_meanAbs \t\t= %f \tSTD: %f\n', meanSats_meanAbs(n), std(Sats_meanAbs));
+% fprintf('Average MATLAB Sats_rms \t\t\t= %f \tSTD: %f\n', meanSats_rms(n), std(Sats_rms));
+% fprintf('Error between SureSign and Sats_meanAbs\t\t\t= %f\n', errSats_meanAbs(n));
+% fprintf('Error between SureSign and Sats_meanAbs_beats\t= %f\n', errSats_meanAbs_beats(n));
 
 % fprintf('Data folder: %s\n\n', FolderName);
 % disp(SureSign);
 
-end
+%disp(FolderName);
+%disp([SatsActual' SatsHeadband']);
+fprintf('%f\n', SatsHeadband'); %, SatsHeadband'
 
-[errSats_meanAbs errSats_meanAbs_beats errSats_rms]
-[mean(errSats_meanAbs) mean(errSats_meanAbs_beats) mean(errSats_rms)]
+
+end
+% fprintf('%f\t,\t%f\t,\t%f\t,\t%f\n', meanSureSign, meanSats_meanAbs, meanSats_meanAbs_beats1, meanSats_meanAbs_beats2)
+% 
+% syms y;
+% x = y;
+% 
+% figure
+% plot(meanSureSign, meanSats_meanAbs_beats2, 'r*'); grid; hold on;
+% axis([96 102 90 102]);
+% fplot(x, 'k'); hold off;
+

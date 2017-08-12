@@ -1,6 +1,6 @@
 clear
 clc
-format short g
+format long g
 
 %% Select Data folder
 DataFolders = dir ('Trial1/*Data*');
@@ -141,7 +141,7 @@ end
 
 fileID = fopen(strcat('Trial1/', FolderName, '\EarPeaksMillis.txt'),'w');
 fprintf(fileID,'Millis\r\n');
-fprintf(fileID,'%d\r\n',EarPeakMillis');
+fprintf(fileID,'%f\r\n', EarPeakMillis');
 fclose(fileID);
 
 %% Nexus Periods
@@ -222,19 +222,20 @@ for i=2:length(EarPeriod_DT)
     EarPeriod_MA(i) = mean(EarPeriod_DT(i-1:i));
 end
 
-% figure('name',FolderName);
-% plot(NexusPPG_X, NexusRSP_DT.*10); hold on;
-% plot(EarPeaks(1:numOfPeaks_Ear-1, 1), EarPeriod_MA, '-o', 'MarkerSize', 3, 'MarkerFaceColor', 'y'); hold on;
-% title(strcat(FolderName, ': Resperation Plots')); xlabel('Time (ms)'); ylabel('Nexus chest expantion and Ear-Monitor beat period');
-% 
-% for i=2:length(EarPeriod_MA)-1
-%     if EarPeriod_MA(i)<EarPeriod_MA(i-1) && EarPeriod_MA(i)<EarPeriod_MA(i+1)
-%     plot(EarPeaks(i, 1), EarPeriod_MA(i), 'r*');
-%     numBreathsDetected = numBreathsDetected+1;
-%     end
-% end
-% 
-% legend('Ear-Monitor beat period','Chest expantion'); hold off;
+figure('name',FolderName);
+plot(NexusPPG_X, NexusRSP_DT.*10); hold on;
+plot(EarPeaks(1:numOfPeaks_Ear-1, 1), EarPeriod_MA, '-o', 'MarkerSize', 3, 'MarkerFaceColor', 'y'); hold on;
+title(strcat(FolderName, ': Resperation Plots')); xlabel('Time (ms)'); ylabel('Nexus chest expantion and Ear-Monitor beat period');
+
+for i=2:length(EarPeriod_MA)-1
+    if EarPeriod_MA(i)<EarPeriod_MA(i-1) && EarPeriod_MA(i)<EarPeriod_MA(i+1)
+    plot(EarPeaks(i, 1), EarPeriod_MA(i), 'r*');
+    numBreathsDetected = numBreathsDetected+1;
+    end
+end
+grid;
+axis([60000 120000 -700 700]);
+legend('Ear-Monitor beat period','Chest expantion'); hold off;
 
 %% Plot Average HR
 for i=1:length(EarPeriod)-10
@@ -301,8 +302,8 @@ else
 end
 %fprintf('\tPeriod Err:\t\t%f\n', mean_errBreathPeriod);
 
-fprintf('\n\n\nbpmNexus\tbpmEar\n');
-fprintf('%f\t,\t%f\n', bpmNexus, bpmEar)
+% fprintf('\n\n\nbpmNexus\tbpmEar\n');
+% fprintf('%f\t,\t%f\n', bpmNexus, bpmEar)
 
 
 

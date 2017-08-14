@@ -14,14 +14,19 @@ function [Tobj] = FirstPolynomialFunction(Tdie, Vsensor)
     % p01 =   -1.17e+04;
     
     %All temp data minus 2 and 4
-    p00 =       39.57;
-    p10 =   -0.006523;
-    p01 =  -1.517e+04;
+%     p00 =       39.57;
+%     p10 =   -0.006523;
+%     p01 =  -1.517e+04;
 
-    %Attemp_A using Phillip1, Talon1, Maretha1, Tayla2, AndreV1
+    %Using Philipp1, Talon1, Maretha1, Tayla1, AndreV1 (all data points)
 %     p00 =       20.31;
 %     p10 =     0.05633;
 %     p01 =  -1.321e+04;
+    
+    %Using Philipp1, Talon1, Maretha1, Tayla1, AndreV1 (averages)
+    p00 =       22.85;
+    p10 =     0.04803;
+    p01 =  -1.344e+04;
 
     Tobj = p00 + p10*Tdie + p01*Vsensor;
     

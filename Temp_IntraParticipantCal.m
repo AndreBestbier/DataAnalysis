@@ -7,7 +7,7 @@ load AuxiliaryDataFiles/TempDataIndex.mat        %All names with valid temp (Exc
 load AuxiliaryDataFiles/ControlDataIndex.mat      %4 prticipants used for calibration
 load AuxiliaryDataFiles/CalibrationDataIndex.mat  %Participants not used for calibration
 
-%usedDataSet = TempDataIndex;
+usedDataSet = CalibrationDataIndex;
 
  usedDataSet = ["2. Jarryd1_Data"
     "2. Jarryd2_Data"
@@ -95,8 +95,8 @@ for n = 1:length(usedDataSet)/2
     Tobj_2b = Tobj_2a + err_1a(n)-0.2;                      %2nd set after calibration
     err_2b(n) = mean(abs(Tobj_Actual-Tobj_2b));         %2nd error after calibration
     
-    Actual = [Actual;Tobj_Actual];
-    Tobj = [Tobj;Tobj_2b];
+    Actual = [Actual;mean(Tobj_Actual)];
+    Tobj = [Tobj;mean(Tobj_2b)];
 
     %% Results
     %err(n) = mean(abs(Tobj_Actual-Tobj));
@@ -117,27 +117,33 @@ for n = 1:length(usedDataSet)/2
 %     fprintf('Average ear object temp (MATLAB) \t= %f\t\tSTD: %f\n', mean(Tobj), std(Tobj));
 %     fprintf('Average ear object temp (MCU) \t\t= %f\t\tSTD: %f\n', mean(TobjMCU), std(TobjMCU));
 %     fprintf('Error (MATLAB) \t\t= %f degC\n\n', err(n));
-    
-    %disp([Tdie Vsensor Tobj_Actual]);
 % 
-%      for q=1:length(Tobj_2b)
+%     disp([Tdie Vsensor Tobj_Actual]);
+% 
+%     for q=1:length(Tobj_2b)
 %         fprintf('%f\t,\t%f\n',Tobj_Actual(q), Tobj_2b(q));
 %     end
 %     fprintf('\n\n');
 
+    
 
-fprintf('%f\t,\t%f\n',mean(Tobj_Actual), mean(Tobj_2b));
-
-    % disp(FolderName);
+%     disp(FolderName);
 %     for q=1:length(Tobj)
 %         fprintf('%f\t,\t%f\t,\t%f\n', Tdie(q), Vsensor(q), Tobj_Actual(q));
 %     end
 %     fprintf('\n');
-
-    %disp(FolderName);
-    % fprintf('Tdie STD\t%f\n', std(Tdie_digital));
-    % fprintf('Vsensor STD\t%f',  std(Vsensor_digital));
-    % fprintf('\n\n\n\n\n\n\n\n\n\n\n\n');
+% 
+%     disp(FolderName);
+%     fprintf('Tdie STD\t%f\n', std(Tdie_digital));
+%     fprintf('Vsensor STD\t%f',  std(Vsensor_digital));
+%     fprintf('\n\n\n\n\n\n\n\n\n\n\n\n');
+    
+    
+      
+    fprintf('%f\t,\t%f\t,\t%f\t,\t%f\n',Tobj_ActualMean, mean(Tobj_2b), std(Tobj_2b), Tobj_ActualMean-mean(Tobj_2b));
+    
+    
+    
 end
 
 disp('Errors');
@@ -145,21 +151,19 @@ disp(err_2b');
 disp('Mean Error');
 disp(mean(err_2b));
 
-
-
-
 Actual(1) = [];
 Tobj(1) = [];
 
 p_Poly = polyfit(Actual,Tobj,1);
 Poly_fit = p_Poly(1)*Actual + p_Poly(2);
 
-
-figure()
-plot(Actual, Tobj,'*'); hold on;
+figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
+plot(Actual, Tobj,'b*'); hold on;
 plot(Actual,Poly_fit,'b-');
-grid
-plot(linspace(36, 39), linspace(36, 39), 'k'); hold off;
+plot(linspace(36, 39), linspace(36, 39), 'k');
+xlabel('Ear-Monitor temperature'); ylabel('ET 100-A temperature');
+title('9.2	Intra-participant calibration results');
+grid; hold off;
 
 
 

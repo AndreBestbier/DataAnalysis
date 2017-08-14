@@ -169,6 +169,22 @@ Period_X = 1:numOfPeaks_Nexus-1;
 % title('Nexus-10: Beat Annotation'); legend('Nexus-10 PPG','Beats annotated');
 % ylabel('nexus-10 PPG value'); xlabel('Time (MS)'); hold off;
 
+
+figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
+subplot(2,1,1);
+plot(EarPPG_X, SSF, 'k'); grid; hold on;
+plot(EarPeaks(:,1), EarPeaks(:,2), 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+title('Ear-Monitor Beat Detection'); %legend('Ear-Monitor SSF', 'Beats detected');
+ylabel('Ear-Monitor SSF value'); xlabel('Time (MS)'); hold off;
+axis([60000 100000 -5 inf]);
+
+subplot(2,1,2);
+plot(NexusPPG_X, NexusPPG, 'k'); grid; hold on;
+plot(NexusPeaks(:,1), NexusPeaks(:,2), 'o', 'Color',[1 0 0],  'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+title('Nexus-10 Beat Annotation'); %legend('Nexus-10 PPG','Beats annotated');
+ylabel('Nexus-10 PPG value'); xlabel('Time (MS)'); hold off;
+axis([60000 100000 -10 inf]);
+
 %% Plot magnatude envelopes
 [upEar, loEar] = envelope(EarPPG, 40,'peak');
 [upNexus, loNexus] = envelope(NexusPPG, 115,'peak');

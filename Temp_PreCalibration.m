@@ -45,6 +45,7 @@ for n = 1:length(usedDataSet)
     
     %% Call CalCurveFunction to calculate Tobj
     Tobj_Poly1 = FirstPolynomialFunction(Tdie, Vsensor);    %First order polynomial
+    CalCurve = CalCurveFunction(Tdie, Vsensor);
 
     %% Results
     err_Poly1(n) = mean(Tobj_Actual-Tobj_Poly1);
@@ -88,8 +89,11 @@ for n = 1:length(usedDataSet)
 
     %fprintf('%f\t,\t%f\n',mean(Tobj_Actual), mean(Tobj_Poly1));
 
-    fprintf('%f\t,\t%f\t,\t%f\t,\t%f\t,\t%f\n', Tobj_ActualMean, std(clicksTemp), mean(Tobj_Poly1), std(Tobj_Poly1), Tobj_ActualMean-mean(Tobj_Poly1));
-
+    %fprintf('%f\t,\t%f\t,\t%f\t,\t%f\t,\t%f\n', Tobj_ActualMean, std(clicksTemp), mean(Tobj_Poly1), std(Tobj_Poly1), Tobj_ActualMean-mean(Tobj_Poly1));
+    fprintf('%f\n', CalCurve);
+    fprintf('');
+    
+    
     % disp(FolderName);
     % fprintf('Tdie STD\t%f\n', std(Tdie_digital));
     % fprintf('Vsensor STD\t%f',  std(Vsensor_digital));
@@ -118,7 +122,9 @@ xlabel('Ear-Monitor temperature'); ylabel('ET 100-A temperature');
 title('Calibration group method results');
 grid; hold off;
 
-%boxplot([err_CalCurve err_Poly], ["CalCurve" "Polynomial"]);
+
+
+
 
 
 

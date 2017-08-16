@@ -2,15 +2,24 @@ clear
 clc
 format long g
 
-%% Select Data folder
-DataFolders = dir ('Trial1/*Data*');
-str = {DataFolders.name};
-[folderNum,v] = listdlg('PromptString','Select a data file:','SelectionMode','single','ListString',str);
+load AuxiliaryDataFiles/AllDataIndex.mat          %All names
 
-fprintf('Data folder: %s\n', char(str(folderNum)));
+
+%% Select Data folder
+% DataFolders = dir ('Trial1/*Data*');
+% str = {DataFolders.name};
+% [folderNum,v] = listdlg('PromptString','Select a data file:','SelectionMode','single','ListString',str);
+
+for q=1:length(AllDataIndex)
+FolderName = AllDataIndex(q);
+%fprintf('Data folder: %s\n', char(str(folderNum)));
+
+clearvars -except q FolderName AllDataIndex
+
+
 
 %% Loading text files--------------------------------------------------------------------------
-FolderName = char(str(folderNum));
+%FolderName = char(str(folderNum));
 ppgText = csvread(strcat('Trial1/', FolderName, '/ppgText.txt'), 3,0);
 beatText = csvread(strcat('Trial1/', FolderName, '/beatText.txt'), 3,0);
 tempText = csvread(strcat('Trial1/', FolderName, '/tempText.txt'), 3,0);
@@ -170,20 +179,20 @@ Period_X = 1:numOfPeaks_Nexus-1;
 % ylabel('nexus-10 PPG value'); xlabel('Time (MS)'); hold off;
 
 
-figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
-subplot(2,1,1);
-plot(EarPPG_X, SSF, 'k'); grid; hold on;
-plot(EarPeaks(:,1), EarPeaks(:,2), 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-title('Ear-Monitor Beat Detection'); %legend('Ear-Monitor SSF', 'Beats detected');
-ylabel('Ear-Monitor SSF value'); xlabel('Time (MS)'); hold off;
-axis([60000 100000 -5 inf]);
-
-subplot(2,1,2);
-plot(NexusPPG_X, NexusPPG, 'k'); grid; hold on;
-plot(NexusPeaks(:,1), NexusPeaks(:,2), 'o', 'Color',[1 0 0],  'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-title('Nexus-10 Beat Annotation'); %legend('Nexus-10 PPG','Beats annotated');
-ylabel('Nexus-10 PPG value'); xlabel('Time (MS)'); hold off;
-axis([60000 100000 -10 inf]);
+% figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
+% subplot(2,1,1);
+% plot(EarPPG_X, SSF, 'k'); grid; hold on;
+% plot(EarPeaks(:,1), EarPeaks(:,2), 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+% title('Ear-Monitor Beat Detection'); %legend('Ear-Monitor SSF', 'Beats detected');
+% ylabel('Ear-Monitor SSF value'); xlabel('Time (MS)'); hold off;
+% axis([60000 100000 -5 inf]);
+% 
+% subplot(2,1,2);
+% plot(NexusPPG_X, NexusPPG, 'k'); grid; hold on;
+% plot(NexusPeaks(:,1), NexusPeaks(:,2), 'o', 'Color',[1 0 0],  'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+% title('Nexus-10 Beat Annotation'); %legend('Nexus-10 PPG','Beats annotated');
+% ylabel('Nexus-10 PPG value'); xlabel('Time (MS)'); hold off;
+% axis([60000 100000 -10 inf]);
 
 %% Plot magnatude envelopes
 [upEar, loEar] = envelope(EarPPG, 40,'peak');
@@ -238,10 +247,11 @@ for i=2:length(EarPeriod_DT)
     EarPeriod_MA(i) = mean(EarPeriod_DT(i-1:i));
 end
 
-figure('name',FolderName);
-plot(NexusPPG_X, NexusRSP_DT.*10); hold on;
-plot(EarPeaks(1:numOfPeaks_Ear-1, 1), EarPeriod_MA, '-o', 'MarkerSize', 3, 'MarkerFaceColor', 'y'); hold on;
-title(strcat(FolderName, ': Resperation Plots')); xlabel('Time (ms)'); ylabel('Nexus chest expantion and Ear-Monitor beat period');
+figure('name',FolderName,'units','normalized','outerposition',[0 0 1 1]);
+plot(EarPeaks(1:numOfPeaks_Ear-1, 1), EarPeriod_MA, '-o', 'MarkerSize', 2, 'MarkerFaceColor', 'r'); hold on;
+plot(NexusPPG_X, NexusRSP_DT*10);
+title(strcat(FolderName, ': Resperation Plots')); xlabel('Time (ms)'); ylabel('Ear-Monitor beat period and scaled Nexus chest expantion');
+axis([0 120000 -700 700]);
 
 for i=2:length(EarPeriod_MA)-1
     if EarPeriod_MA(i)<EarPeriod_MA(i-1) && EarPeriod_MA(i)<EarPeriod_MA(i+1)
@@ -250,8 +260,9 @@ for i=2:length(EarPeriod_MA)-1
     end
 end
 grid;
-axis([60000 120000 -700 700]);
-legend('Ear-Monitor beat period','Chest expantion'); hold off;
+
+legend('Ear-Monitor beat period','Chest expantion');
+hold off;
 
 %% Plot Average HR
 for i=1:length(EarPeriod)-10
@@ -298,31 +309,30 @@ end
 
 
 %% Print Results
-fprintf('Number of peaks detected\n');
-fprintf('\tEar-Monitor:\t%d\n', numOfPeaks_Ear);
-fprintf('\tNexus:\t\t\t%d\n', numOfPeaks_Nexus);
-fprintf('\t%%\t\t\t\t%d%%\n\n', numOfPeaks_Ear/numOfPeaks_Nexus*100);
-fprintf('Breaths detected %d\n\n', numBreathsDetected);
+% fprintf('Number of peaks detected\n');
+% fprintf('\tEar-Monitor:\t%d\n', numOfPeaks_Ear);
+% fprintf('\tNexus:\t\t\t%d\n', numOfPeaks_Nexus);
+% fprintf('\t%%\t\t\t\t%d%%\n\n', numOfPeaks_Ear/numOfPeaks_Nexus*100);
 
-if numOfPeaks_Ear==numOfPeaks_Nexus
-    fprintf('Mean period Err (ms)\n');
-    fprintf('\tPeriod Err\t\t%f\n\n', meanPeriodErr);
-    fprintf('Mean bpm Err\n');
-    fprintf('\tBPM Err\t\t\t%f\n\n', meanBpmErr);
-    fprintf('Mean magnetudes\n');
-    fprintf('\tEar-Monitor:\t%f\n', mean_magnatudeEar);
-    fprintf('\tNexus:\t\t\t%f\n', mean_magnatudeNexus);
-    fprintf('Mean Breath Period Err\n');
-else
-    fprintf('Not all the beats were detected by the Ear-Monitor!!\n\n');
+
+
+fprintf('%f\n', 60000/mean(NexusPeriod(1:round(length(NexusPeriod)/2))));
+
+% if numOfPeaks_Ear==numOfPeaks_Nexus
+%     fprintf('Mean period Err (ms)\n');
+%     fprintf('\tPeriod Err\t\t%f\n\n', meanPeriodErr);
+%     fprintf('Mean bpm Err\n');
+%     fprintf('\tBPM Err\t\t\t%f\n\n', meanBpmErr);
+%     fprintf('Mean magnetudes\n');
+%     fprintf('\tEar-Monitor:\t%f\n', mean_magnatudeEar);
+%     fprintf('\tNexus:\t\t\t%f\n', mean_magnatudeNexus);
+%     fprintf('Mean Breath Period Err\n');
+% else
+%     fprintf('Not all the beats were detected by the Ear-Monitor!!\n\n');
+% end
+
+
 end
-%fprintf('\tPeriod Err:\t\t%f\n', mean_errBreathPeriod);
-
-% fprintf('\n\n\nbpmNexus\tbpmEar\n');
-% fprintf('%f\t,\t%f\n', bpmNexus, bpmEar)
-
-
-
 
 
 

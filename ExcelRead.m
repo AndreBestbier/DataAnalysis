@@ -109,80 +109,85 @@ x = y;
 % title('10-beat average heart rate: Nexus-10 vs. Ear-Monitor'); xlabel('Nexus-10 average heart rate (bpm)'); ylabel('Ear-Monitor average heart rate (bpm)'); hold off;
 
 %% Respiration
-Breaths = csvread('AuxiliaryDataFiles/Respiration_ICC.txt');
+% Breaths = csvread('AuxiliaryDataFiles/Respiration_ICC.txt');
+% 
+% Actual_All = Breaths(:,1);
+% Headband_All = Breaths(:,2);
+% Error_All = Breaths(:,3);
+% HR_All = Breaths(:,4);
+% Actual_1 = Breaths(:,5);
+% Headband_1 = Breaths(:,6);
+% Error_1 = Breaths(:,7);
+% HR_1 = Breaths(:,8);
+% Actual_2 = Breaths(:,9);
+% Headband_2 = Breaths(:,10);
+% Error_2 = Breaths(:,11);
+% HR_2 = Breaths(:,12);
+% 
+% figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
+% plot(Actual_1, Headband_1, 'bo'); hold on;
+% plot(Actual_All, Headband_All, 'ro');
+% fplot(x, 'k'); hold off;
+% axis([3 48 3 48]);
+% legend('After 1 minute','After 2 minutes','y = x');
+% xlabel('Number of Nexus-10 breaths'); ylabel('Number of Ear-Monitor breaths');
+% title('Number of breaths: Nexus-10 vs. Ear-Monitor'); grid; hold off;
+% 
+% figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
+% plot(Error_1, HR_1, 'bo'); hold on;
+% plot(Error_2, HR_2, 'ro');
+% legend('Normal breathing','Breathing exercise');
+% xlabel('Error: No. of Breaths_{Nexus-10} - No. of Breaths_{Ear-Monitor}'); ylabel('Average Heart Rate');
+% title('Error vs. Average Heart Rate'); hold off;
+% 
+% 
+% figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
+% plot(Error_1, Actual_1, 'bo'); hold on;
+% plot(Error_2, Actual_2, 'ro');
+% legend('Normal breathing','Breathing exercise');
+% xlabel('Error: No. of Breaths_{Nexus-10} vs. No. of Breaths_{Ear-Monitor}'); ylabel('Respiratory rate');
+% axis([-3 6 0 30]);
+% title('Error vs. Respiratory rate'); grid; hold off;
 
-Actual_All = Breaths(:,1);
-Headband_All = Breaths(:,2);
-Error_All = Breaths(:,3);
-HR_All = Breaths(:,4);
-Actual_1 = Breaths(:,5);
-Headband_1 = Breaths(:,6);
-Error_1 = Breaths(:,7);
-HR_1 = Breaths(:,8);
-Actual_2 = Breaths(:,9);
-Headband_2 = Breaths(:,10);
-Error_2 = Breaths(:,11);
-HR_2 = Breaths(:,12);
+
+
+%% Sats
+Sats = csvread('AuxiliaryDataFiles/SatsAverage_ICC.txt',2);
+Actual = Sats(:,1);
+Headband_meanAbs = Sats(:,2);
+Headband_meanAbs_beats = Sats(:,3);
+Headband_rms = Sats(:,4);
+
+
+p_meanAbs = polyfit(Actual,Headband_meanAbs,1);
+p_meanAbs_beats = polyfit(Actual,Headband_meanAbs_beats,1);
+p_rms = polyfit(Actual,Headband_rms,1);
+
+
+meanAbs_fit = p_meanAbs(1)*Actual + p_meanAbs(2);
+meanAbs_beats_fit = p_meanAbs_beats(1)*Actual + p_meanAbs_beats(2);
+rms_fit = p_rms(1)*Actual + p_rms(2);
+
 
 figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
-plot(Actual_1, Headband_1, 'bo'); hold on;
-plot(Actual_All, Headband_All, 'ro');
-fplot(x, 'k'); hold off;
-axis([3 48 3 48]);
-legend('After 1 minute','After 2 minutes','y = x');
-xlabel('Number of Nexus-10 breaths'); ylabel('Number of Ear-Monitor breaths');
-title('Number of breaths: Nexus-10 vs. Ear-Monitor'); grid; hold off;
 
-figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
-plot(Error_1, HR_1, 'bo'); hold on;
-plot(Error_2, HR_2, 'ro');
-legend('Normal breathing','Breathing exercise');
-xlabel('Error: No. of Breaths_{Nexus-10} - No. of Breaths_{Ear-Monitor}'); ylabel('Average Heart Rate');
-title('Error vs. Average Heart Rate'); hold off;
+plot(Actual, Headband_meanAbs, 'r*'); hold on;
+plot(Actual, Headband_meanAbs_beats, 'g*');
+plot(Actual, Headband_rms, 'b*');
 
+plot(Actual, meanAbs_fit, 'r-');
+plot(Actual, meanAbs_beats_fit, 'g-');
+plot(Actual, rms_fit, 'b-');
 
-figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7])
-plot(Error_1, Actual_1, 'bo'); hold on;
-plot(Error_2, Actual_2, 'ro');
-legend('Normal breathing','Breathing exercise');
-xlabel('Error: No. of Breaths_{Nexus-10} vs. No. of Breaths_{Ear-Monitor}'); ylabel('Respiratory rate');
-axis([-3 6 0 30]);
-title('Error vs. Respiratory rate'); grid; hold off;
+axis([96 102 90 102]);
+fplot(x, 'k');
+legend('Headband-meanAbs','Headband-meanAbs_beats','Headband-rms');
+xlabel('SureSigns SpO_2'); ylabel('Ear-Monitor SpO_2');
+grid; hold off;
 
-
-
-%%
-% Sats = csvread('AuxiliaryDataFiles/SatsAverage_ICC.txt',2);
-% Actual = Sats(:,1);
-% Headband_meanAbs = Sats(:,2);
-% Headband_meanAbs_beats = Sats(:,3);
-% Headband_rms = Sats(:,4);
-% 
-% figure
-% plot(Actual, Headband_meanAbs, 'r*'); grid; hold on;
-%plot(Actual, Headband_meanAbs_beats, 'g*');
-%plot(Actual, Headband_rms, 'b*');
-% axis([96 102 90 102]);
-% fplot(x, 'k'); hold off;
-% 
-% figure
-% %plot(Actual, Headband_meanAbs, 'r*'); grid; hold on;
-% plot(Actual, Headband_meanAbs_beats, 'g*'); hold on;
-% %plot(Actual, Headband_rms, 'b*');
-% axis([96 102 90 102]);
-% fplot(x, 'k'); hold off;
-% 
-% figure
-% %plot(Actual, Headband_meanAbs, 'r*'); grid; hold on;
-% %plot(Actual, Headband_meanAbs_beats, 'g*');
-% plot(Actual, Headband_rms, 'b*'); hold on;
-% axis([96 102 90 102]);
-% fplot(x, 'k'); hold off;
-
-% figure
-% Sats = csvread('AuxiliaryDataFiles/Sats_ICC.txt',2);
-% Actual = Sats(:,1);
-% Headband = Sats(:,2);
-% plot(Actual, Headband, 'k*'); grid; hold on;
-% axis([min(Actual)*0.99 max(Actual)*1.01 min(Headband)*0.99 max(Headband)*1.01])
-% fplot(x, 'k'); hold off;
+figure('units','normalized','outerposition',[0.25 0.25 0.55 0.7]);
+plot(Actual, Headband_meanAbs, 'r*'); hold on;
+plot(Actual, meanAbs_fit, 'r-');
+fplot(x, 'k');
+axis([96 102 90 102]);
+grid; hold off;

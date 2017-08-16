@@ -154,22 +154,22 @@ errSats_meanAbs_beats1(n) =  meanSureSign(n)-meanSats_meanAbs_beats1(n);
 errSats_meanAbs_beats2(n) =  meanSureSign(n)-meanSats_meanAbs_beats2(n);
 errSats_rms(n) =  meanSureSign(n)-meanSats_rms(n);
 
-%% Plot
-% figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
-% subplot(2,1,1)
-% plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
-% plot(ppgMillis, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
-% plot(EarPeaksMillis_X, Sats_meanAbs_beats1, 'Color',[56/255 52/255 173/255]);
-% plot(EarPeaksMillis_X, Sats_meanAbs_beats2, 'Color',[200/255 100/255 173/255]);
-% axis([SureSign_X(1)-1000 SureSign_X(length(SureSign_X))+1000 92 103]);
-% %legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats1', 'MATLAB Sats-meanAbs-beats2'); hold off;
-% 
-% subplot(2,1,2)
-% plot(ppgMillis, irAC_filt); hold on;
-% plot(ppgMillis, redAC_filt);
-% plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
-% axis([SureSign_X(1)-1000 SureSign_X(length(SureSign_X))+1000 -100 100]);
-% legend('IR AC','Red AC'); hold off;
+% Plot
+figure('name',FolderName, 'units','normalized','outerposition',[0 0 1 1]);
+subplot(2,1,1)
+plot(SureSign_X, SureSign, 'Color',[178/255 48/255 48/255]); hold on;
+plot(ppgMillis, Sats_meanAbs, 'Color',[121/255 178/255 196/255]);
+plot(EarPeaksMillis_X, Sats_meanAbs_beats1, 'Color',[56/255 52/255 173/255]);
+plot(EarPeaksMillis_X, Sats_meanAbs_beats2, 'Color',[200/255 100/255 173/255]);
+axis([SureSign_X(1)-1000 SureSign_X(length(SureSign_X))+1000 92 103]);
+%legend('SureSign Sats', 'MATLAB Sats-meanAbs', 'MATLAB Sats-meanAbs-beats1', 'MATLAB Sats-meanAbs-beats2'); hold off;
+
+subplot(2,1,2)
+plot(ppgMillis, irAC_filt); hold on;
+plot(ppgMillis, redAC_filt);
+plot(EarPeaksMillis, 50, 'o', 'Color',[1 0 0], 'MarkerSize', 3, 'MarkerFaceColor', [1 0 0]);
+axis([SureSign_X(1)-1000 SureSign_X(length(SureSign_X))+1000 -100 100]);
+legend('IR AC','Red AC'); hold off;
 
 
 %% Print Results
